@@ -1,0 +1,7 @@
+{
+    "uuid": "lol-another-window-extension@plexescor",
+    "name": "lol another window extension",
+    "description": "Exposes the focused window's WM class and title via D-Bus.",
+    "shell-version": ["46", "47", "48", "49", "50"],
+    "version": 1
+}
