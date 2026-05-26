@@ -79,28 +79,6 @@ Example output:
 
 ---
 
-## Hooking it up in C++
-
-The two methods mirror the `window-calls-extended` interface so the only changes needed are the object path and interface name:
-
-```diff
-- "/org/gnome/Shell/Extensions/WindowsExt --method "
-- "org.gnome.Shell.Extensions.WindowsExt.FocusClass"
-+ "/org/gnome/Shell/Extensions/LolAnotherWindowExtension --method "
-+ "org.gnome.Shell.Extensions.LolAnotherWindowExtension.FocusClass"
-```
-
-```diff
-- "/org/gnome/Shell/Extensions/WindowsExt --method "
-- "org.gnome.Shell.Extensions.WindowsExt.FocusTitle"
-+ "/org/gnome/Shell/Extensions/LolAnotherWindowExtension --method "
-+ "org.gnome.Shell.Extensions.LolAnotherWindowExtension.FocusTitle"
-```
-
-The raw output format is identical so the existing parsing logic is untouched.
-
----
-
 ## Logs
 
 ```bash
