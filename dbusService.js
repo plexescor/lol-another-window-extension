@@ -1,5 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Shell from 'gi://Shell';
 
 const IFACE_XML = `
 <node>
@@ -9,6 +10,9 @@ const IFACE_XML = `
     </method>
     <method name="FocusTitle">
       <arg type="s" direction="out" name="title" />
+    </method>
+    <method name="FocusAppId">
+      <arg type="s" direction="out" name="appId" />
     </method>
     <signal name="WindowChanged">
       <arg type="s" name="wmClass" />
@@ -23,6 +27,7 @@ export class LolService {
     constructor() {
         this._wmClass = '';
         this._title   = '';
+        this._appId   = '';
         this._focusId = null;
         this._titleId = null;
         this._win     = null;
@@ -35,7 +40,6 @@ export class LolService {
 
         this._focusId = global.display.connect('notify::focus-window', () => this._onFocus());
 
-        // grab whatever's already focused when the extension loads
         this._onFocus();
     }
 
@@ -59,6 +63,7 @@ export class LolService {
     // d-bus methods
     FocusClass() { return this._wmClass; }
     FocusTitle() { return this._title;   }
+    FocusAppId() { return this._appId;   }
 
     _onFocus() {
         this._unhookTitle();
@@ -70,11 +75,14 @@ export class LolService {
             this._wmClass = win.get_wm_class() ?? '';
             this._title   = win.get_title()    ?? '';
 
-            // track title changes while this window stays focused (e.g. browser tabs)
+            const app     = Shell.WindowTracker.get_default().get_window_app(win);
+            this._appId   = app ? app.get_id() : '';
+
             this._titleId = win.connect('notify::title', () => this._onTitle());
         } else {
             this._wmClass = '';
             this._title   = '';
+            this._appId   = '';
         }
 
         this._emit();
