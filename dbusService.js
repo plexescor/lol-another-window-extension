@@ -1,6 +1,5 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Shell from 'gi://Shell';
 
 const IFACE_XML = `
 <node>
@@ -74,54 +73,16 @@ export class LolService {
         if (win) {
             this._wmClass = win.get_wm_class() ?? '';
             this._title   = win.get_title()    ?? '';
-            this._appId   = '';
+            this._appId   = String(win.get_pid() ?? 0);
 
             this._titleId = win.connect('notify::title', () => this._onTitle());
-
-            this._resolveAppId(win);
         } else {
             this._wmClass = '';
             this._title   = '';
-            this._appId   = '';
+            this._appId   = '0';
         }
 
         this._emit();
-    }
-
-    _resolveAppId(win, attempt = 0) {
-        const tracker = Shell.WindowTracker.get_default();
-        const app = tracker.get_window_app(win);
-
-        if (app) {
-            if (win === this._win) {
-                this._appId = app.get_id();
-                this._emit();
-            }
-            return;
-        }
-
-        // Fallback: AppSystem lookup by wm_class (covers Flatpak/sandboxed apps
-        // where tracker can return null even after mapping)
-        const appSys = Shell.AppSystem.get_default();
-        const fallback = appSys.lookup_startup_wmclass(this._wmClass)
-                      ?? appSys.lookup_desktop_wmclass(this._wmClass);
-
-        if (fallback) {
-            if (win === this._win) {
-                this._appId = fallback.get_id();
-                this._emit();
-            }
-            return;
-        }
-
-        // Retry with increasing delay — covers the race where notify::focus-window
-        // fires before WindowTracker finishes its window-created mapping
-        if (attempt < 5) {
-            GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50 * (attempt + 1), () => {
-                if (win === this._win) this._resolveAppId(win, attempt + 1);
-                return GLib.SOURCE_REMOVE;
-            });
-        }
     }
 
     _onTitle() {
