@@ -1,6 +1,8 @@
 # lol-another-window-extension
 
-Tracks the currently focused window and exposes its WM class and title over D-Bus.
+Tracks the currently focused window and exposes its WM class, title, and application ID over D-Bus.
+
+This extension was developed for and is used by **[HPR (Human Pattern Recorder)](https://github.com/plexescor/HPR)** — a compiled, offline, zero-account activity tracker that watches active windows and tracks application time usage locally.
 
 ## Install
 
@@ -25,6 +27,12 @@ Or toggle it in the Extensions app. On Wayland you need to log out and back in a
 | Destination | `org.gnome.Shell` |
 | Object path | `/org/gnome/Shell/Extensions/LolAnotherWindowExtension` |
 | Interface | `org.gnome.Shell.Extensions.LolAnotherWindowExtension` |
+
+### Available D-Bus Methods
+
+- `FocusClass`: Returns the WM class of the focused window.
+- `FocusTitle`: Returns the title of the focused window.
+- `FocusAppId`: Returns the application ID / desktop file ID of the focused window.
 
 ---
 
@@ -56,6 +64,21 @@ Example output:
 
 ```
 ('GitHub — Mozilla Firefox',)
+```
+
+## Get the application ID of the focused window
+
+```bash
+gdbus call --session \
+  --dest org.gnome.Shell \
+  --object-path /org/gnome/Shell/Extensions/LolAnotherWindowExtension \
+  --method org.gnome.Shell.Extensions.LolAnotherWindowExtension.FocusAppId
+```
+
+Example output:
+
+```
+('org.mozilla.firefox',)
 ```
 
 ---
