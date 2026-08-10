@@ -32,7 +32,7 @@ Or toggle it in the Extensions app. On Wayland you need to log out and back in a
 
 - `FocusClass`: Returns the WM class of the focused window.
 - `FocusTitle`: Returns the title of the focused window.
-- `FocusAppId`: Returns the application ID / desktop file ID of the focused window.
+- `FocusAppId`: Returns the process PID (`get_pid()`) of the focused window as a string.
 
 ---
 
@@ -66,7 +66,7 @@ Example output:
 ('GitHub — Mozilla Firefox',)
 ```
 
-## Get the application ID of the focused window
+## Get the PID (FocusAppId) of the focused window
 
 ```bash
 gdbus call --session \
@@ -78,7 +78,7 @@ gdbus call --session \
 Example output:
 
 ```
-('org.mozilla.firefox',)
+('12345',)
 ```
 
 ---
