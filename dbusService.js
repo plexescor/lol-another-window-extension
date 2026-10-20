@@ -20,6 +20,12 @@ const IFACE_XML = `
   </interface>
 </node>`;
 
+// Parse XML once at module scope — fixes GNOME 51 where wrapJSObject with a
+// raw string on every enable() breaks the method-lookup cache in GDBus and
+// GjsPrivate.DBusImplementation became a final type (no more subclassing).
+// Passing the pre-parsed GDBusInterfaceInfo object works on GNOME 45–51+.
+const IFACE_INFO = Gio.DBusNodeInfo.new_for_xml(IFACE_XML).interfaces[0];
+
 const OBJ_PATH = '/org/gnome/Shell/Extensions/LolAnotherWindowExtension';
 
 export class LolService {
@@ -34,7 +40,7 @@ export class LolService {
     }
 
     enable() {
-        this._dbus = Gio.DBusExportedObject.wrapJSObject(IFACE_XML, this);
+        this._dbus = Gio.DBusExportedObject.wrapJSObject(IFACE_INFO, this);
         this._dbus.export(Gio.DBus.session, OBJ_PATH);
 
         this._focusId = global.display.connect('notify::focus-window', () => this._onFocus());
@@ -59,7 +65,7 @@ export class LolService {
         this._win = null;
     }
 
-    // d-bus methods
+    // DBus methods — names must match the XML exactly
     FocusClass() { return this._wmClass; }
     FocusTitle() { return this._title;   }
     FocusAppId() { return this._appId;   }
